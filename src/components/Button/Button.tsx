@@ -1,8 +1,12 @@
 import style from './Button.module.css';
 
-export default function Button() {
+type Props = {
+  loadMoreHandler: () => void;
+};
+
+export default function Button({ loadMoreHandler }: Props) {
   return (
-    <button className={style.Button} type="button">
+    <button className={style.Button} type="button" onClick={loadMoreHandler}>
       Load More
     </button>
   );

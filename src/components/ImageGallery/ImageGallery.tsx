@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import searchApi from '../../services/search-api';
+import notFound from '../../assets/images/notFound.webp';
+import styles from './ImageGallery.module.css';
 import ImageGalleryItemsList from '../ImageGalleryItemsList';
 import Loader from '../Loader/Loader';
 import Button from '../Button/Button';
@@ -16,7 +18,8 @@ interface State {
     tags: string;
   }[];
   error: string | undefined;
-  status: 'idle' | 'pending' | 'resolved' | 'error';
+  status: 'idle' | 'pending' | 'resolved' | 'error' | 'notFound';
+  page: number;
 }
 
 class ImageGallery extends Component<Props, State> {
@@ -24,6 +27,7 @@ class ImageGallery extends Component<Props, State> {
     searchResults: [],
     error: '',
     status: 'idle',
+    page: 1,
   };
 
   componentDidUpdate(
@@ -32,21 +36,43 @@ class ImageGallery extends Component<Props, State> {
     snapshot?: any
   ) {
     let { searchQuery } = this.props;
+    let { page } = this.state;
 
     if (searchQuery !== prevProps.searchQuery) {
       this.setState({ status: 'pending' });
 
       searchApi
         .fetchImages(searchQuery)
-        .then(searchResults =>
+        .then(({ hits }) => {
+          if (hits.length > 0) {
+            this.setState({
+              searchResults: hits,
+              status: 'resolved',
+            });
+          } else if (hits.length == 0) {
+            this.setState({
+              status: 'notFound',
+            });
+          }
+        })
+        .catch(error => this.setState({ error, status: 'error' }));
+    } else if (page !== prevState.page) {
+      searchApi
+        .fetchImages(searchQuery, page)
+        .then(({ hits }) =>
           this.setState({
-            searchResults: searchResults.hits,
-            status: 'resolved',
+            searchResults: [...prevState.searchResults, ...hits],
           })
         )
         .catch(error => this.setState({ error, status: 'error' }));
     }
   }
+
+  loadMoreHandler = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
 
   render() {
     let { searchResults, status, error } = this.state;
@@ -55,17 +81,31 @@ class ImageGallery extends Component<Props, State> {
       return (
         <>
           <ImageGalleryItemsList searchResults={searchResults} />
-          <Button />
+          <Button loadMoreHandler={this.loadMoreHandler} />
         </>
       );
     }
 
     if (status === 'pending') {
-      return <Loader />;
+      return (
+        <>
+          <Loader />
+        </>
+      );
     }
 
     if (status === 'error') {
       return <p>{error}</p>;
+    }
+
+    if (status === 'notFound') {
+      return (
+        <img
+          src={notFound}
+          className={styles.notFound}
+          alt="nothing was found"
+        />
+      );
     }
   }
 }

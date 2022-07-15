@@ -17,6 +17,7 @@ class App extends Component<{}, State> {
   handleSubmit = (searchQuery: string) => {
     this.setState({ searchQuery });
   };
+
   render() {
     return (
       <div className="App">
