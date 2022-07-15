@@ -7,6 +7,7 @@ const modalRoot = document.querySelector('#modal-root');
 type Props = {
   onCloseModal: () => void;
   modalImage: string;
+  tags: string;
 };
 
 export default class Modal extends Component<Props> {
@@ -31,13 +32,13 @@ export default class Modal extends Component<Props> {
   };
 
   render() {
-    let { modalImage } = this.props;
+    let { modalImage, tags } = this.props;
     let { handleBackdropClick } = this;
     console.log(modalImage);
     return createPortal(
       <div className={css.Overlay} onClick={handleBackdropClick}>
         <div className={css.Modal}>
-          <img src={modalImage} alt="" />
+          <img src={modalImage} alt={tags} />
         </div>
       </div>,
       modalRoot!

@@ -25,6 +25,7 @@ interface State {
   page: number;
   showModal: boolean;
   modalImage: string;
+  tags: string;
 }
 
 class ImageGallery extends Component<Props, State> {
@@ -35,6 +36,7 @@ class ImageGallery extends Component<Props, State> {
     page: 1,
     showModal: false,
     modalImage: '',
+    tags: '',
   };
 
   componentDidUpdate(
@@ -81,9 +83,10 @@ class ImageGallery extends Component<Props, State> {
     }));
   };
 
-  imgClickHandler = (largeImageURL: string) => {
+  imgClickHandler = (largeImageURL: string, tags: string) => {
     this.setState({
       modalImage: largeImageURL,
+      tags,
     });
     this.toggleModal();
   };
@@ -95,14 +98,18 @@ class ImageGallery extends Component<Props, State> {
   };
 
   render() {
-    let { searchResults, status, error, modalImage } = this.state;
+    let { searchResults, status, error, modalImage, tags } = this.state;
     let { toggleModal, imgClickHandler, loadMoreHandler } = this;
 
     if (status === 'resolved') {
       return (
         <>
           {this.state.showModal && (
-            <Modal modalImage={modalImage} onCloseModal={toggleModal} />
+            <Modal
+              modalImage={modalImage}
+              tags={tags}
+              onCloseModal={toggleModal}
+            />
           )}
           {searchResults.length > 0 && (
             <ul className="ImageGallery">
@@ -114,7 +121,7 @@ class ImageGallery extends Component<Props, State> {
                     id={id}
                     alt={tags}
                     key={id}
-                    onImgClick={() => imgClickHandler(largeImageURL)}
+                    onImgClick={() => imgClickHandler(largeImageURL, tags)}
                   />
                 )
               )}
