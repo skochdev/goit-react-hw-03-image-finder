@@ -36,9 +36,12 @@ class Searchbar extends Component<Props, State> {
   };
 
   render() {
+    let { handleFormSubmit, handleInputChange } = this;
+    let { searchQuery } = this.state;
+
     return (
       <header className={styles.Searchbar}>
-        <form className={styles.SearchForm} onSubmit={this.handleFormSubmit}>
+        <form className={styles.SearchForm} onSubmit={handleFormSubmit}>
           <button type="submit" className={styles.SearchFormButton}>
             <span>
               <ImSearch />
@@ -51,9 +54,9 @@ class Searchbar extends Component<Props, State> {
             name="searchQuery"
             autoComplete="off"
             autoFocus
-            value={this.state.searchQuery}
+            value={searchQuery}
             placeholder="Search for images and photos"
-            onChange={this.handleInputChange}
+            onChange={handleInputChange}
           />
         </form>
       </header>

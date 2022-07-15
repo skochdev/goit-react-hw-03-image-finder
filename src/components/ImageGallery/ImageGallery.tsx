@@ -2,24 +2,29 @@ import React, { Component } from 'react';
 import searchApi from '../../services/search-api';
 import notFound from '../../assets/images/notFound.webp';
 import styles from './ImageGallery.module.css';
-import ImageGalleryItemsList from '../ImageGalleryItemsList';
 import Loader from '../Loader/Loader';
 import Button from '../Button/Button';
+import ImageGalleryItem from '../ImageGalleryItem';
+import Modal from '../Modal';
 
 interface Props {
   searchQuery: string;
 }
 
+type SearchResults = {
+  id: number;
+  webformatURL: string;
+  largeImageURL: string;
+  tags: string;
+};
+
 interface State {
-  searchResults: {
-    id: number;
-    webformatURL: string;
-    largeImageURL: string;
-    tags: string;
-  }[];
+  searchResults: SearchResults[];
   error: string | undefined;
   status: 'idle' | 'pending' | 'resolved' | 'error' | 'notFound';
   page: number;
+  showModal: boolean;
+  modalImage: string;
 }
 
 class ImageGallery extends Component<Props, State> {
@@ -28,6 +33,8 @@ class ImageGallery extends Component<Props, State> {
     error: '',
     status: 'idle',
     page: 1,
+    showModal: false,
+    modalImage: '',
   };
 
   componentDidUpdate(
@@ -49,7 +56,7 @@ class ImageGallery extends Component<Props, State> {
               searchResults: hits,
               status: 'resolved',
             });
-          } else if (hits.length == 0) {
+          } else if (hits.length === 0) {
             this.setState({
               status: 'notFound',
             });
@@ -74,14 +81,47 @@ class ImageGallery extends Component<Props, State> {
     }));
   };
 
+  imgClickHandler = (largeImageURL: string) => {
+    this.setState({
+      modalImage: largeImageURL,
+    });
+    this.toggleModal();
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
   render() {
-    let { searchResults, status, error } = this.state;
+    let { searchResults, status, error, modalImage } = this.state;
+    let { toggleModal, imgClickHandler, loadMoreHandler } = this;
 
     if (status === 'resolved') {
       return (
         <>
-          <ImageGalleryItemsList searchResults={searchResults} />
-          <Button loadMoreHandler={this.loadMoreHandler} />
+          {this.state.showModal && (
+            <Modal modalImage={modalImage} onCloseModal={toggleModal} />
+          )}
+          {searchResults.length > 0 && (
+            <ul className="ImageGallery">
+              {searchResults.map(
+                ({ id, webformatURL, largeImageURL, tags }) => (
+                  <ImageGalleryItem
+                    webformatURL={webformatURL}
+                    largeImageURL={largeImageURL}
+                    id={id}
+                    alt={tags}
+                    key={id}
+                    onImgClick={() => imgClickHandler(largeImageURL)}
+                  />
+                )
+              )}
+            </ul>
+          )}
+
+          <Button loadMoreHandler={loadMoreHandler} />
         </>
       );
     }

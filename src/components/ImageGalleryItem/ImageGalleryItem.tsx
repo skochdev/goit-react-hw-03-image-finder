@@ -3,11 +3,18 @@ type Props = {
   webformatURL: string;
   largeImageURL: string;
   alt: string;
+  onImgClick: () => void;
 };
 
-function ImageGalleryItem({ webformatURL, id, largeImageURL, alt }: Props) {
+function ImageGalleryItem({
+  webformatURL,
+  id,
+  largeImageURL,
+  alt,
+  onImgClick,
+}: Props) {
   return (
-    <li className="ImageGalleryItem">
+    <li className="ImageGalleryItem" onClick={onImgClick}>
       <img src={webformatURL} alt={alt} className="ImageGalleryItemImage" />
     </li>
   );

@@ -19,10 +19,13 @@ class App extends Component<{}, State> {
   };
 
   render() {
+    let { handleSubmit } = this;
+    let { searchQuery } = this.state;
+
     return (
       <div className="App">
-        <Searchbar onSubmit={this.handleSubmit} />
-        <ImageGallery searchQuery={this.state.searchQuery} />
+        <Searchbar onSubmit={handleSubmit} />
+        <ImageGallery searchQuery={searchQuery} />
 
         <ToastContainer autoClose={2000} />
       </div>
