@@ -32,7 +32,6 @@ class Searchbar extends Component<Props, State> {
     }
 
     this.props.onSubmit(this.state.searchQuery);
-
   };
 
   render() {
