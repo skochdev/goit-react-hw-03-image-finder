@@ -20,6 +20,7 @@ type SearchResults = {
 
 interface State {
   searchResults: SearchResults[];
+  total: number;
   error: string | undefined;
   status: 'idle' | 'pending' | 'resolved' | 'error' | 'notFound';
   page: number;
@@ -31,6 +32,7 @@ interface State {
 class ImageGallery extends Component<Props, State> {
   state: State = {
     searchResults: [],
+    total: 0,
     error: '',
     status: 'idle',
     page: 1,
@@ -52,10 +54,11 @@ class ImageGallery extends Component<Props, State> {
 
       searchApi
         .fetchImages(searchQuery)
-        .then(({ hits }) => {
+        .then(({ hits, totalHits }) => {
           if (hits.length > 0) {
             this.setState({
               searchResults: hits,
+              total: totalHits,
               status: 'resolved',
             });
           } else if (hits.length === 0) {
@@ -98,7 +101,7 @@ class ImageGallery extends Component<Props, State> {
   };
 
   render() {
-    let { searchResults, status, error, modalImage, tags } = this.state;
+    let { searchResults, status, error, modalImage, tags, total } = this.state;
     let { toggleModal, imgClickHandler, loadMoreHandler } = this;
 
     if (status === 'resolved') {
@@ -128,7 +131,9 @@ class ImageGallery extends Component<Props, State> {
             </ul>
           )}
 
-          <Button loadMoreHandler={loadMoreHandler} />
+          {searchResults.length < total && (
+            <Button loadMoreHandler={loadMoreHandler} />
+          )}
         </>
       );
     }
